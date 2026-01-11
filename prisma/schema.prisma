@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CampaignStatus {
+  DRAFT
+  SCHEDULED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum EmailLogStatus {
+  SENT
+  FAILED
+  OPENED
+}
+
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  password  String
+  name      String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  contacts  Contact[]
+  campaigns Campaign[]
+  messages  Message[]
+
+  @@map("users")
+}
+
+model Contact {
+  id        String   @id @default(uuid())
+  email     String
+  name      String?
+  userId    String
+  createdAt DateTime @default(now())
+
+  user      User       @relation(fields: [userId], references: [id])
+  emailLogs EmailLog[]
+
+  @@unique([email, userId])
+  @@map("contacts")
+}
+
+model Campaign {
+  id          String         @id @default(uuid())
+  subject     String
+  body        String         @db.Text
+  status      CampaignStatus @default(DRAFT)
+  scheduledAt DateTime?
+  userId      String
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  user      User       @relation(fields: [userId], references: [id])
+  emailLogs EmailLog[]
+
+  @@map("campaigns")
+}
+
+model EmailLog {
+  id         String         @id @default(uuid())
+  campaignId String
+  contactId  String
+  status     EmailLogStatus @default(SENT)
+  sentAt     DateTime       @default(now())
+  errorMsg   String?
+
+  campaign Campaign @relation(fields: [campaignId], references: [id])
+  contact  Contact  @relation(fields: [contactId], references: [id])
+
+  @@map("email_logs")
+}
+
+model ChatRoom {
+  id        String    @id @default(uuid())
+  name      String?
+  createdAt DateTime  @default(now())
+  messages  Message[]
+
+  @@map("chat_rooms")
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  content   String
+  senderId  String
+  roomId    String
+  createdAt DateTime @default(now())
+
+  sender User     @relation(fields: [senderId], references: [id])
+  room   ChatRoom @relation(fields: [roomId], references: [id])
+  files  File[]
+
+  @@map("messages")
+}
+
+model File {
+  id       String @id @default(uuid())
+  filename String
+  key      String
+  url      String
+  mimetype String
+  size     Int
+
+  messageId String?
+  message   Message? @relation(fields: [messageId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@map("files")
+}

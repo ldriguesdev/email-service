@@ -2,6 +2,7 @@ import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from '@nestjs/commo
 import { Response } from 'express'; // ou fastify
 import { DomainError } from '../../core/domain/errors/domain-error';
 import { UserAlreadyExistsError } from '../../modules/users/domain/errors/user-already-exists.error';
+import { UnauthorizedError } from '@modules/users/domain/errors/unauthorized.error';
 
 @Catch(DomainError)
 export class DomainExceptionFilter implements ExceptionFilter {
@@ -14,6 +15,10 @@ export class DomainExceptionFilter implements ExceptionFilter {
     if (exception instanceof UserAlreadyExistsError) {
       status = HttpStatus.CONFLICT;
     } 
+
+    if (exception instanceof UnauthorizedError) {
+      status = HttpStatus.UNAUTHORIZED;
+    }
 
     response.status(status).json({
       statusCode: status,

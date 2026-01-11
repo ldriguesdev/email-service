@@ -8,9 +8,9 @@ import { PrismaUserMapper } from '../mappers/prisma-user.mapper';
 export class PrismaUserRepository implements IUserRepository {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(): Promise<User[]> {
+  async findAll() {
     const users = await this.prisma.user.findMany();
-    
+
     return users.map(PrismaUserMapper.toDomain);
   }
 
@@ -25,5 +25,12 @@ export class PrismaUserRepository implements IUserRepository {
     if (!raw) return null;
 
     return PrismaUserMapper.toDomain(raw);
+  }
+
+  async updateRefreshToken(userId: string, refreshToken: string | null) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { refreshToken },
+    });
   }
 }

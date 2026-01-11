@@ -23,15 +23,16 @@ enum EmailLogStatus {
 }
 
 model User {
-  id        String     @id @default(uuid())
-  email     String     @unique
-  password  String
-  name      String?
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  contacts  Contact[]
-  campaigns Campaign[]
-  messages  Message[]
+  id           String     @id @default(uuid())
+  email        String     @unique
+  password     String
+  name         String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  refreshToken String?
+  contacts     Contact[]
+  campaigns    Campaign[]
+  messages     Message[]
 
   @@map("users")
 }

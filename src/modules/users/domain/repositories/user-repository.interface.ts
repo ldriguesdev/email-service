@@ -8,4 +8,5 @@ export abstract class IUserRepository {
     userId: string,
     refreshToken: string | null,
   ): Promise<void>;
+  abstract findById(userId: string): Promise<User | null>;
 }

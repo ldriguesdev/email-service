@@ -12,6 +12,7 @@ import { SignInUseCase } from './application/use-cases/sign-in.use-case';
 import { ITokenProvider } from './application/providers/token-provider.interface';
 import { JwtTokenProvider } from './infrastructure/providers/jwt-token.provider';
 import { AuthController } from './infrastructure/http/controllers/auth.controller';
+import { GetUserByIdUseCase } from './application/use-cases/get-user-by-id.usecase';
 
 @Module({
   imports: [PrismaModule, JwtModule.register({})],
@@ -20,6 +21,7 @@ import { AuthController } from './infrastructure/http/controllers/auth.controlle
     CreateUserUseCase,
     ListUsersUseCase,
     SignInUseCase,
+    GetUserByIdUseCase,
     {
       provide: IHashProvider,
       useClass: BcryptHashProvider,

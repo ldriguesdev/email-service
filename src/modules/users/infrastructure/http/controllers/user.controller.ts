@@ -3,19 +3,23 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
+  Req,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { UserPresenter } from '../presenters/user.presenter';
 import { ListUsersUseCase } from '@modules/users/application/use-cases/list-users.use-case';
+import { GetUserByIdUseCase } from '@modules/users/application/use-cases/get-user-by-id.usecase';
 
 @Controller('users')
 export class UserController {
   constructor(
     private readonly createUserUseCase: CreateUserUseCase,
     private readonly listUsersUseCase: ListUsersUseCase,
+    private readonly getUserByIdUseCase: GetUserByIdUseCase,
   ) {}
 
   @Post()
@@ -36,8 +40,13 @@ export class UserController {
   async list() {
     const { users } = await this.listUsersUseCase.execute();
 
-    return {
-      users: users.map(UserPresenter.toHTTP),
-    };
+    return users.map(UserPresenter.toHTTP);
+  }
+
+  @Get(':id')
+  async profile(@Param('id') userId: string) {
+    const { user } = await this.getUserByIdUseCase.execute({ userId });
+
+    return UserPresenter.toHTTP(user);
   }
 }

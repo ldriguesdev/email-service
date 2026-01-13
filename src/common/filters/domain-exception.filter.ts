@@ -3,6 +3,7 @@ import { Response } from 'express'; // ou fastify
 import { DomainError } from '../../core/domain/errors/domain-error';
 import { UserAlreadyExistsError } from '../../modules/users/domain/errors/user-already-exists.error';
 import { UnauthorizedError } from '@modules/users/domain/errors/unauthorized.error';
+import { UserNotExistsError } from '@modules/users/domain/errors/user-not-exists.error';
 
 @Catch(DomainError)
 export class DomainExceptionFilter implements ExceptionFilter {
@@ -18,6 +19,10 @@ export class DomainExceptionFilter implements ExceptionFilter {
 
     if (exception instanceof UnauthorizedError) {
       status = HttpStatus.UNAUTHORIZED;
+    }
+
+    if (exception instanceof UserNotExistsError) {
+      status = HttpStatus.NOT_FOUND;
     }
 
     response.status(status).json({
